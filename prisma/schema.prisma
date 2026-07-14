@@ -1,0 +1,194 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// --- ENUMS ---
+enum Role {
+  RECRUITER
+  CANDIDATE
+}
+
+enum JobStatus {
+  DRAFT
+  OPEN
+  CLOSED
+  ARCHIVED
+}
+
+enum ApplicationStage {
+  APPLIED
+  SCREENING
+  INTERVIEW
+  OFFER
+  HIRED
+  REJECTED
+}
+
+enum InterviewStatus {
+  SCHEDULED
+  COMPLETED
+  CANCELLED
+}
+
+// --- AUTH.JS REQUIRED TABLES ---
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// --- DOMAIN MODELS ---
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  passwordHash  String?
+  role          Role      @default(CANDIDATE)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts         Account[]
+  sessions         Session[]
+  jobs             Job[]             @relation("RecruiterJobs")
+  candidateProfile CandidateProfile?
+  interviews       Interview[]       @relation("Interviewer")
+  notifications    Notification[]
+  auditLogs        AuditLog[]
+}
+
+model CandidateProfile {
+  id         String   @id @default(cuid())
+  userId     String   @unique
+  phone      String?
+  experience String?  @db.Text
+  education  String?  @db.Text
+  skills     String[]
+  linkedin   String?
+  portfolio  String?
+  summary    String?  @db.Text
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  applications Application[]
+}
+
+model Job {
+  id             String    @id @default(cuid())
+  title          String
+  department     String
+  location       String
+  employmentType String
+  salaryRange    String?
+  description    String    @db.Text
+  requiredSkills String[]
+  status         JobStatus @default(DRAFT)
+  recruiterId    String
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  recruiter    User          @relation("RecruiterJobs", fields: [recruiterId], references: [id])
+  applications Application[]
+}
+
+model Application {
+  id           String           @id @default(cuid())
+  jobId        String
+  candidateId  String
+  resumeUrl    String?
+  coverLetter  String?          @db.Text
+  currentStage ApplicationStage @default(APPLIED)
+  appliedAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  job        Job               @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  candidate  CandidateProfile  @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  interviews Interview[]
+}
+
+model Interview {
+  id            String          @id @default(cuid())
+  applicationId String
+  interviewerId String
+  scheduledAt   DateTime
+  meetingLink   String?
+  interviewType String
+  status        InterviewStatus @default(SCHEDULED)
+  notes         String?         @db.Text
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  interviewer User        @relation("Interviewer", fields: [interviewerId], references: [id])
+  scorecard   Scorecard?
+}
+
+model Scorecard {
+  id             String   @id @default(cuid())
+  interviewId    String   @unique
+  technical      Int      @default(0)
+  communication  Int      @default(0)
+  problemSolving Int      @default(0)
+  behaviour      Int      @default(0)
+  cultureFit     Int      @default(0)
+  overallScore   Float    @default(0)
+  recommendation String   // e.g., "Strong Hire", "No Hire"
+  feedback       String   @db.Text
+  createdAt      DateTime @default(now())
+
+  interview Interview @relation(fields: [interviewId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String
+  action    String
+  entity    String
+  entityId  String
+  timestamp DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
