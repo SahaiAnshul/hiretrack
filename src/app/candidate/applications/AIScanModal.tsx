@@ -55,7 +55,7 @@ export function AIScanModal({ isOpen, onClose, application, candidateProfile }: 
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
-      <div className="w-full max-w-xl bg-white rounded-2xl border border-gray-100 shadow-xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-200">
+      <div className="w-full max-w-xl bg-white rounded-2xl border border-gray-100 shadow-xl flex flex-col whitespace-normal text-left animate-in fade-in zoom-in-95 duration-200">
         
         {/* Header */}
         <div className="flex items-center justify-between border-b px-6 py-4 bg-gray-50/50">
@@ -76,8 +76,8 @@ export function AIScanModal({ isOpen, onClose, application, candidateProfile }: 
           </button>
         </div>
 
-        {/* Scrollable Body */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+        {/* Unified Body */}
+        <div className="p-6 space-y-5 overflow-y-auto max-h-[65vh] break-words">
           
           {/* ATS Score Circular Meter */}
           <div className="flex flex-col sm:flex-row items-center gap-6 bg-gray-50 border border-gray-150 p-5 rounded-2xl">

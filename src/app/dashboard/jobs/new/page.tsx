@@ -32,6 +32,9 @@ export default function CreateJobPage() {
       location: "",
       employmentType: "Full-time",
       salaryRange: "",
+      workingHours: "",
+      workingDays: "",
+      experienceLevel: "",
       description: "",
       requiredSkills: "",
       status: "OPEN",
@@ -92,37 +95,61 @@ We are looking for a skilled **${title}** to join our **${department}** team. In
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 rounded-xl border bg-white p-6 shadow-sm">
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="title">Job Title</Label>
-            <Input id="title" disabled={isPending} placeholder="e.g. Senior Frontend Engineer" {...form.register("title")} />
+            <Label htmlFor="title">Job Title <span className="text-red-500">*</span></Label>
+            <Input id="title" required disabled={isPending} placeholder="e.g. Senior Frontend Engineer" {...form.register("title")} />
             {form.formState.errors.title && <p className="text-sm text-red-500">{form.formState.errors.title.message}</p>}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="companyName">Company Name</Label>
-            <Input id="companyName" disabled={isPending} placeholder="e.g. Google" {...form.register("companyName")} />
+            <Label htmlFor="companyName">Company Name <span className="text-red-500">*</span></Label>
+            <Input id="companyName" required disabled={isPending} placeholder="e.g. Google" {...form.register("companyName")} />
             {form.formState.errors.companyName && <p className="text-sm text-red-500">{form.formState.errors.companyName.message}</p>}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="department">Department</Label>
-            <Input id="department" disabled={isPending} placeholder="e.g. Engineering" {...form.register("department")} />
+            <Label htmlFor="department">Department <span className="text-red-500">*</span></Label>
+            <Input id="department" required disabled={isPending} placeholder="e.g. Engineering" {...form.register("department")} />
             {form.formState.errors.department && <p className="text-sm text-red-500">{form.formState.errors.department.message}</p>}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="location">Location</Label>
-            <Input id="location" disabled={isPending} placeholder="e.g. Remote, San Francisco" {...form.register("location")} />
+            <Label htmlFor="location">Location <span className="text-red-500">*</span></Label>
+            <Input id="location" required disabled={isPending} placeholder="e.g. Remote, San Francisco" {...form.register("location")} />
             {form.formState.errors.location && <p className="text-sm text-red-500">{form.formState.errors.location.message}</p>}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="expiresAt">Visibility Expiry Date</Label>
-            <Input id="expiresAt" type="date" disabled={isPending} {...form.register("expiresAt")} />
+            <Label htmlFor="expiresAt">Visibility Expiry Date <span className="text-red-500">*</span></Label>
+            <Input id="expiresAt" required type="date" disabled={isPending} {...form.register("expiresAt")} />
             {form.formState.errors.expiresAt && <p className="text-sm text-red-500">{form.formState.errors.expiresAt.message}</p>}
           </div>
 
           <div className="space-y-2">
-            <Label>Employment Type</Label>
+            <Label htmlFor="salaryRange">Salary Range <span className="text-red-500">*</span></Label>
+            <Input id="salaryRange" required disabled={isPending} placeholder="e.g. $80,000 - $100,000" {...form.register("salaryRange")} />
+            {form.formState.errors.salaryRange && <p className="text-sm text-red-500">{form.formState.errors.salaryRange.message}</p>}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="workingHours">Working Hours <span className="text-red-500">*</span></Label>
+            <Input id="workingHours" required disabled={isPending} placeholder="e.g. 9 AM - 6 PM" {...form.register("workingHours")} />
+            {form.formState.errors.workingHours && <p className="text-sm text-red-500">{form.formState.errors.workingHours.message}</p>}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="workingDays">Working Days & Offs <span className="text-red-500">*</span></Label>
+            <Input id="workingDays" required disabled={isPending} placeholder="e.g. Mon-Fri (Sat-Sun off)" {...form.register("workingDays")} />
+            {form.formState.errors.workingDays && <p className="text-sm text-red-500">{form.formState.errors.workingDays.message}</p>}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="experienceLevel">Experience Level Required <span className="text-red-500">*</span></Label>
+            <Input id="experienceLevel" required disabled={isPending} placeholder="e.g. Mid-Level (2-4 years)" {...form.register("experienceLevel")} />
+            {form.formState.errors.experienceLevel && <p className="text-sm text-red-500">{form.formState.errors.experienceLevel.message}</p>}
+          </div>
+
+          <div className="space-y-2">
+            <Label>Employment Type <span className="text-red-500">*</span></Label>
             <Select 
               disabled={isPending} 
               onValueChange={(val) => form.setValue("employmentType", val || "")} 
@@ -141,14 +168,14 @@ We are looking for a skilled **${title}** to join our **${department}** team. In
           </div>
 
           <div className="space-y-2 md:col-span-2">
-            <Label htmlFor="requiredSkills">Required Skills (comma separated)</Label>
-            <Input id="requiredSkills" disabled={isPending} placeholder="React, TypeScript, Node.js" {...form.register("requiredSkills")} />
+            <Label htmlFor="requiredSkills">Required Skills (comma separated) <span className="text-red-500">*</span></Label>
+            <Input id="requiredSkills" required disabled={isPending} placeholder="React, TypeScript, Node.js" {...form.register("requiredSkills")} />
             {form.formState.errors.requiredSkills && <p className="text-sm text-red-500">{form.formState.errors.requiredSkills.message}</p>}
           </div>
 
           <div className="space-y-2 md:col-span-2">
             <div className="flex justify-between items-center">
-              <Label htmlFor="description">Job Description</Label>
+              <Label htmlFor="description">Job Description <span className="text-red-500">*</span></Label>
               <button
                 type="button"
                 onClick={generateDescriptionTemplate}
@@ -157,7 +184,7 @@ We are looking for a skilled **${title}** to join our **${department}** team. In
                 ✨ Generate Template
               </button>
             </div>
-            <Textarea id="description" disabled={isPending} className="min-h-[180px] leading-relaxed" placeholder="Detailed description of the role..." {...form.register("description")} />
+            <Textarea id="description" required disabled={isPending} className="min-h-[180px] leading-relaxed" placeholder="Detailed description of the role..." {...form.register("description")} />
             {form.formState.errors.description && <p className="text-sm text-red-500">{form.formState.errors.description.message}</p>}
           </div>
         </div>

@@ -35,8 +35,7 @@ import {
   Star,
   CheckCircle,
   Clock,
-  Video,
-  UserCheck
+  Video
 } from "lucide-react";
 
 // Types

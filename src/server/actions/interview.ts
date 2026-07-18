@@ -39,6 +39,24 @@ export async function scheduleInterview(data: ScheduleInterviewInput) {
       },
     });
 
+    const application = await db.application.findUnique({
+      where: { id: applicationId },
+      include: {
+        candidate: true,
+        job: true,
+      },
+    });
+
+    if (application) {
+      await db.notification.create({
+        data: {
+          userId: application.candidate.userId,
+          title: "Interview Scheduled",
+          message: `An interview for "${application.job.title}" has been scheduled for ${new Date(scheduledAt).toLocaleString()}.`,
+        },
+      });
+    }
+
     revalidatePath(`/dashboard/jobs/${jobId}/pipeline`);
     return { success: "Interview scheduled successfully!" };
   } catch (error) {

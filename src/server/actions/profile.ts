@@ -77,3 +77,68 @@ export async function updateCandidateProfile(data: ProfileInput) {
     return { error: "An unexpected error occurred while saving your profile." };
   }
 }
+
+export async function deleteUserAccount() {
+  try {
+    const session = await auth();
+    if (!session?.user) {
+      return { error: "Unauthorized." };
+    }
+
+    const userId = session.user.id;
+
+    if (session.user.role === "CANDIDATE") {
+      // 1. Fetch Candidate Profile
+      const profile = await db.candidateProfile.findUnique({
+        where: { userId },
+      });
+
+      if (profile) {
+        // Delete all applications (Prisma onDelete: Cascade handles application interviews and scorecards)
+        await db.application.deleteMany({
+          where: { candidateId: profile.id },
+        });
+
+        // Delete candidate profile
+        await db.candidateProfile.delete({
+          where: { id: profile.id },
+        });
+      }
+    } else if (session.user.role === "RECRUITER") {
+      // 1. Fetch recruiter jobs
+      const jobs = await db.job.findMany({
+        where: { recruiterId: userId },
+        select: { id: true },
+      });
+
+      const jobIds = jobs.map((j) => j.id);
+
+      if (jobIds.length > 0) {
+        // Delete all applications to these jobs (Cascades to interviews and scorecards)
+        await db.application.deleteMany({
+          where: { jobId: { in: jobIds } },
+        });
+
+        // Delete recruiter jobs
+        await db.job.deleteMany({
+          where: { recruiterId: userId },
+        });
+      }
+
+      // 2. Delete interviews where this recruiter was interviewer
+      await db.interview.deleteMany({
+        where: { interviewerId: userId },
+      });
+    }
+
+    // 2. Delete User account
+    await db.user.delete({
+      where: { id: userId },
+    });
+
+    return { success: "Account deleted successfully." };
+  } catch (error) {
+    console.error("Delete Account Error:", error);
+    return { error: "Failed to delete account. Please try again." };
+  }
+}

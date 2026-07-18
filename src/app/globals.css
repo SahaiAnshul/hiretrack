@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@variant dark (&:where(.dark, .dark *));
 @plugin "tailwindcss-animate";
 
 @theme {
@@ -57,6 +58,58 @@
     --ring: 161 33% 27%;
     --radius: 0.5rem;
   }
+
+  .dark {
+    --background: 222.2 84% 6%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 7%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 6%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 161 33% 30%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 17 50% 48%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 15%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 15%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 35%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 16%;
+    --input: 217.2 32.6% 16%;
+    --ring: 161 33% 30%;
+  }
+
+  /* Font scaling configurations */
+  html[data-font-size="small"] {
+    font-size: 14px;
+  }
+  html[data-font-size="medium"] {
+    font-size: 16px;
+  }
+  html[data-font-size="large"] {
+    font-size: 18px;
+  }
+
+  /* Padding layout density configurations */
+  html[data-density="compact"] {
+    --radius: 0.25rem;
+  }
+  html[data-density="compact"] .p-8,
+  html[data-density="compact"] .p-6 {
+    padding: 1rem !important;
+  }
+  html[data-density="compact"] .space-y-8 > :not([hidden]) ~ :not([hidden]) {
+    margin-top: 1rem !important;
+  }
+  html[data-density="compact"] .space-y-6 > :not([hidden]) ~ :not([hidden]) {
+    margin-top: 0.75rem !important;
+  }
+  html[data-density="compact"] .py-12 {
+    padding-top: 1.5rem !important;
+    padding-bottom: 1.5rem !important;
+  }
 }
 
 @layer base {
@@ -66,5 +119,84 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+  }
+}
+
+@layer base {
+  .dark body {
+    background-color: #090d16 !important;
+    color: #f8fafc !important;
+  }
+  .dark .bg-white {
+    background-color: #111827 !important;
+  }
+  .dark .bg-\[\#F7F5F2\],
+  .dark .bg-\[\#F7F5F2\]\/50 {
+    background-color: #090d16 !important;
+  }
+  .dark .text-slate-900,
+  .dark .text-gray-900,
+  .dark .text-slate-800 {
+    color: #f8fafc !important;
+  }
+  .dark .text-gray-700,
+  .dark .text-gray-600 {
+    color: #cbd5e1 !important;
+  }
+  .dark .text-gray-500 {
+    color: #94a3b8 !important;
+  }
+  .dark .border,
+  .dark .border-gray-200,
+  .dark .border-gray-100 {
+    border-color: #1f2937 !important;
+  }
+  .dark input,
+  .dark textarea,
+  .dark select,
+  .dark button.border-gray-200 {
+    background-color: #1e293b !important;
+    color: #f8fafc !important;
+    border-color: #334155 !important;
+  }
+  .dark .bg-gray-50,
+  .dark .bg-gray-50\/55,
+  .dark .bg-gray-100\/55,
+  .dark .bg-gray-50\/50,
+  .dark .bg-gray-100\/50 {
+    background-color: #1e293b !important;
+  }
+  .dark .hover\:bg-gray-50:hover,
+  .dark .hover\:bg-gray-50\/40:hover {
+    background-color: rgba(30, 41, 59, 0.6) !important;
+  }
+  .dark header {
+    background-color: #111827 !important;
+    border-color: #1f2937 !important;
+  }
+  .dark .bg-\[\#F7F5F2\] {
+    background-color: #090d16 !important;
+  }
+  .dark .ring-gray-200 {
+    --tw-ring-color: #1f2937 !important;
+  }
+  .dark .text-slate-900,
+  .dark .text-slate-800 {
+    color: #f8fafc !important;
+  }
+  .dark .text-gray-600 {
+    color: #94a3b8 !important;
+  }
+  .dark .text-gray-700 {
+    color: #cbd5e1 !important;
+  }
+  .dark .text-gray-500 {
+    color: #94a3b8 !important;
+  }
+}
+
+@layer base {
+  body, div, header, nav, input, button, textarea, select, span, p, h1, h2, h3, h4, th, td, table, a {
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, fill 0.3s ease, stroke 0.3s ease !important;
   }
 }

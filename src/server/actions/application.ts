@@ -53,6 +53,22 @@ export async function applyForJob(
       },
     });
 
+    // Notify recruiter
+    const job = await db.job.findUnique({
+      where: { id: jobId },
+      select: { recruiterId: true, title: true },
+    });
+
+    if (job) {
+      await db.notification.create({
+        data: {
+          userId: job.recruiterId,
+          title: "New Application",
+          message: `${session.user.name || "A candidate"} applied for "${job.title}".`,
+        },
+      });
+    }
+
     revalidatePath("/candidate/jobs");
     return { success: "Application submitted successfully." };
   } catch (error) {
@@ -77,7 +93,10 @@ export async function moveCandidate(applicationId: string, newStage: Application
     // Verify ownership of the job this application belongs to
     const application = await db.application.findUnique({
       where: { id: applicationId },
-      include: { job: true },
+      include: {
+        job: true,
+        candidate: true,
+      },
     });
 
     if (!application || application.job.recruiterId !== session.user.id) {
@@ -88,6 +107,17 @@ export async function moveCandidate(applicationId: string, newStage: Application
       where: { id: applicationId },
       data: { currentStage: newStage },
     });
+
+    // Notify candidate
+    if (application) {
+      await db.notification.create({
+        data: {
+          userId: application.candidate.userId,
+          title: "Application Status Update",
+          message: `Your application for "${application.job.title}" has been moved to ${newStage}.`,
+        },
+      });
+    }
 
     // Revalidate the pipeline page
     revalidatePath(`/dashboard/jobs/${application.jobId}/pipeline`);

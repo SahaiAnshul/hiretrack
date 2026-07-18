@@ -2,7 +2,8 @@ import { auth, signOut } from "@/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, Briefcase, LogOut } from "lucide-react";
+import { LayoutDashboard, Briefcase, LogOut, Settings } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default async function RecruiterLayout({
   children,
@@ -51,11 +52,19 @@ export default async function RecruiterLayout({
                 <Briefcase className="h-4 w-4" />
                 Jobs
               </Link>
+              <Link
+                href="/dashboard/settings"
+                className="flex items-center gap-1.5 text-sm font-medium text-gray-600 hover:text-slate-950 transition-colors"
+              >
+                <Settings className="h-4 w-4" />
+                Settings
+              </Link>
             </nav>
           </div>
 
           <div className="flex items-center gap-4">
-            <span className="text-sm font-medium text-gray-700 hidden sm:inline">
+            <ThemeToggle />
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300 hidden sm:inline">
               {session.user.name}
             </span>
             <form
@@ -68,7 +77,7 @@ export default async function RecruiterLayout({
                 variant="ghost"
                 size="sm"
                 type="submit"
-                className="text-gray-600 hover:text-red-600 flex items-center gap-1.5"
+                className="text-gray-600 dark:text-gray-300 hover:text-red-650 flex items-center gap-1.5"
               >
                 <LogOut className="h-4 w-4" />
                 <span className="hidden md:inline">Sign out</span>
@@ -93,6 +102,13 @@ export default async function RecruiterLayout({
         >
           <Briefcase className="h-4 w-4" />
           Jobs
+        </Link>
+        <Link
+          href="/dashboard/settings"
+          className="flex flex-col items-center gap-1 text-xs font-medium text-gray-600 hover:text-[#2F5D50]"
+        >
+          <Settings className="h-4 w-4" />
+          Settings
         </Link>
       </div>
 

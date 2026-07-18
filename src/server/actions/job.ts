@@ -20,7 +20,21 @@ export async function createJob(data: JobInput) {
       return { error: "Invalid data provided. Please check the form." };
     }
 
-    const { title, companyName, department, location, employmentType, salaryRange, description, requiredSkills, status, expiresAt } = validatedData.data;
+    const {
+      title,
+      companyName,
+      department,
+      location,
+      employmentType,
+      salaryRange,
+      description,
+      requiredSkills,
+      status,
+      expiresAt,
+      workingHours,
+      workingDays,
+      experienceLevel,
+    } = validatedData.data;
 
     // 3. Mutate
     const job = await db.job.create({
@@ -31,6 +45,9 @@ export async function createJob(data: JobInput) {
         location,
         employmentType,
         salaryRange,
+        workingHours: workingHours || null,
+        workingDays: workingDays || null,
+        experienceLevel: experienceLevel || null,
         description,
         requiredSkills: requiredSkills.split(",").map((s) => s.trim()).filter(Boolean),
         status,
@@ -41,6 +58,8 @@ export async function createJob(data: JobInput) {
 
     // 4. Revalidate & Return
     revalidatePath("/dashboard/jobs");
+    revalidatePath("/dashboard");
+    revalidatePath("/candidate/jobs");
     return { success: "Job posted successfully.", jobId: job.id };
   } catch (error) {
     console.error("Create Job Error:", error);
@@ -72,6 +91,8 @@ export async function archiveJob(jobId: string) {
     });
 
     revalidatePath("/dashboard/jobs");
+    revalidatePath("/dashboard");
+    revalidatePath("/candidate/jobs");
     return { success: "Job archived successfully." };
   } catch (error) {
     console.error("Archive Job Error:", error);

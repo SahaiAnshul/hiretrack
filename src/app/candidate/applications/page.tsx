@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Briefcase, Calendar, CheckCircle2, Loader2, ArrowRight } from "lucide-react";
+import { Calendar, CheckCircle2, Loader2, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { WithdrawButton } from "./WithdrawButton";
 import { AIScanButton } from "./AIScanButton";

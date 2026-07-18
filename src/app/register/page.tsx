@@ -10,13 +10,14 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Link from "next/link";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function RegisterPage() {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   const form = useForm<RegisterInput>({
     resolver: zodResolver(registerSchema),
@@ -61,21 +62,54 @@ export default function RegisterPage() {
 
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
-            <Input id="password" type="password" placeholder="••••••••" disabled={isPending} {...form.register("password")} />
+            <div className="relative">
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                placeholder="••••••••"
+                disabled={isPending}
+                className="pr-10"
+                {...form.register("password")}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-650"
+              >
+                {showPassword ? <EyeOff className="h-4.5 w-4.5" /> : <Eye className="h-4.5 w-4.5" />}
+              </button>
+            </div>
             {form.formState.errors.password && <p className="text-sm text-red-500">{form.formState.errors.password.message}</p>}
           </div>
 
           <div className="space-y-2">
-            <Label>I am a...</Label>
-            <Select disabled={isPending} onValueChange={(val) => form.setValue("role", val as "RECRUITER" | "CANDIDATE")} defaultValue="CANDIDATE">
-              <SelectTrigger>
-                <SelectValue placeholder="Select a role" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="CANDIDATE">Candidate looking for a job</SelectItem>
-                <SelectItem value="RECRUITER">Recruiter looking to hire</SelectItem>
-              </SelectContent>
-            </Select>
+            <Label className="text-xs font-bold uppercase tracking-wider text-slate-500">I want to join as a</Label>
+            <div className="grid grid-cols-2 gap-1 rounded-xl bg-slate-100 dark:bg-slate-900 p-1 border border-gray-200 dark:border-slate-800">
+              <button
+                type="button"
+                disabled={isPending}
+                onClick={() => form.setValue("role", "CANDIDATE")}
+                className={`py-2 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                  form.watch("role") === "CANDIDATE"
+                    ? "bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm border border-gray-200 dark:border-slate-700"
+                    : "text-gray-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-gray-200 bg-transparent border border-transparent"
+                }`}
+              >
+                Candidate
+              </button>
+              <button
+                type="button"
+                disabled={isPending}
+                onClick={() => form.setValue("role", "RECRUITER")}
+                className={`py-2 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                  form.watch("role") === "RECRUITER"
+                    ? "bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm border border-gray-200 dark:border-slate-700"
+                    : "text-gray-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-gray-200 bg-transparent border border-transparent"
+                }`}
+              >
+                Recruiter
+              </button>
+            </div>
           </div>
 
           {error && <div className="rounded-md bg-red-50 p-3 text-sm text-red-500">{error}</div>}

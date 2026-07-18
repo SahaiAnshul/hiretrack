@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Users, Briefcase, Calendar, ArrowRight, UserCheck } from "lucide-react";
+import { PlusCircle, Users, Briefcase, ArrowRight, UserCheck } from "lucide-react";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -39,21 +39,23 @@ export default async function DashboardPage() {
     },
   });
 
-  // 2. Fetch candidate counts grouped by stage
+  // 2. Fetch candidate counts grouped by stage in a single query (pool-safe)
+  const applications = await db.application.findMany({
+    where: {
+      job: {
+        recruiterId: session.user.id,
+      },
+    },
+    select: {
+      currentStage: true,
+    },
+  });
+
   const stagesList = ["APPLIED", "SCREENING", "INTERVIEW", "OFFER", "HIRED", "REJECTED"] as const;
-  const stageCounts = await Promise.all(
-    stagesList.map(async (stage) => {
-      const count = await db.application.count({
-        where: {
-          currentStage: stage,
-          job: {
-            recruiterId: session.user.id,
-          },
-        },
-      });
-      return { stage, count };
-    })
-  );
+  const stageCounts = stagesList.map((stage) => {
+    const count = applications.filter((app) => app.currentStage === stage).length;
+    return { stage, count };
+  });
 
   return (
     <div className="bg-[#F7F5F2] min-h-[calc(100vh-4rem)]">

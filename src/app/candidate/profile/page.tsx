@@ -17,6 +17,15 @@ export default async function CandidateProfilePage() {
     where: { id: session.user.id },
     include: {
       candidateProfile: true,
+      auditLogs: {
+        where: { action: "LOGIN" },
+        orderBy: { timestamp: "desc" },
+        take: 10,
+        select: {
+          id: true,
+          timestamp: true,
+        },
+      },
     },
   });
 
@@ -29,6 +38,7 @@ export default async function CandidateProfilePage() {
   // 2. Format values for initial data
   const initialData = {
     name: user.name || "",
+    username: user.username || "",
     phone: profile?.phone || "",
     summary: profile?.summary || "",
     experience: profile?.experience || "",
@@ -47,7 +57,7 @@ export default async function CandidateProfilePage() {
         </p>
       </div>
 
-      <ProfileForm initialData={initialData} />
+      <ProfileForm initialData={initialData} loginHistory={user.auditLogs} />
     </div>
   );
 }

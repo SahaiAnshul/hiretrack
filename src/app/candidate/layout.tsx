@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Briefcase, FileText, LogOut, User } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default async function CandidateLayout({
   children,
@@ -62,7 +63,8 @@ export default async function CandidateLayout({
           </div>
 
           <div className="flex items-center gap-4">
-            <span className="text-sm font-medium text-gray-700 hidden sm:inline">
+            <ThemeToggle />
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300 hidden sm:inline">
               {session.user.name}
             </span>
             <form
@@ -75,7 +77,7 @@ export default async function CandidateLayout({
                 variant="ghost"
                 size="sm"
                 type="submit"
-                className="text-gray-600 hover:text-red-600 flex items-center gap-1.5"
+                className="text-gray-600 dark:text-gray-300 hover:text-red-650 flex items-center gap-1.5"
               >
                 <LogOut className="h-4 w-4" />
                 <span className="hidden md:inline">Sign out</span>

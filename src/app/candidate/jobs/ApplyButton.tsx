@@ -112,11 +112,12 @@ export function ApplyButton({ jobId, jobTitle, isApplied }: ApplyButtonProps) {
               {/* Cover Letter */}
               <div className="space-y-1.5">
                 <Label htmlFor="coverLetter" className="text-gray-700 text-xs font-semibold">
-                  Cover Letter / Note to Recruiter
+                  Cover Letter / Note to Recruiter <span className="text-red-500">*</span>
                 </Label>
                 <Textarea
                   id="coverLetter"
                   rows={4}
+                  required
                   placeholder="Introduce yourself and explain why you are a great fit for this role..."
                   value={coverLetter}
                   onChange={(e) => setCoverLetter(e.target.value)}

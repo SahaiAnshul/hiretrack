@@ -2,7 +2,8 @@ import { db } from "@/lib/db";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { ApplyButton } from "./ApplyButton";
-import { Briefcase, MapPin, DollarSign, Calendar, Tag } from "lucide-react";
+import { JobMemoPanel } from "@/components/features/jobs/JobMemoPanel";
+import { Briefcase, MapPin, DollarSign, Calendar, Tag, Clock, Award } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -26,9 +27,13 @@ export default async function CandidateJobsPage() {
       createdAt: "desc",
     },
   });
-
   // 2. Fetch user's candidate profile
   const profile = await db.candidateProfile.findUnique({
+    where: { userId: session.user.id },
+  });
+
+  // 2. Fetch user's job notes/memos
+  const jobNotes = await db.jobNote.findMany({
     where: { userId: session.user.id },
   });
 
@@ -71,6 +76,8 @@ export default async function CandidateJobsPage() {
             const matchPercentage = required.length > 0
               ? Math.round((matchingSkills.length / required.length) * 100)
               : 100;
+            const memo = jobNotes.find((n) => n.jobId === job.id)?.content || "";
+            
             return (
               <div
                 key={job.id}
@@ -102,6 +109,24 @@ export default async function CandidateJobsPage() {
                       <div className="flex items-center gap-0.5">
                         <DollarSign className="h-4 w-4 text-gray-400" />
                         {job.salaryRange}
+                      </div>
+                    )}
+                    {job.workingHours && (
+                      <div className="flex items-center gap-1">
+                        <Clock className="h-4 w-4 text-gray-400" />
+                        <span>Hours: {job.workingHours}</span>
+                      </div>
+                    )}
+                    {job.workingDays && (
+                      <div className="flex items-center gap-1">
+                        <Calendar className="h-4 w-4 text-gray-400" />
+                        <span>Schedule: {job.workingDays}</span>
+                      </div>
+                    )}
+                    {job.experienceLevel && (
+                      <div className="flex items-center gap-1">
+                        <Award className="h-4 w-4 text-gray-400" />
+                        <span>Exp: {job.experienceLevel}</span>
                       </div>
                     )}
                     <div className="flex items-center gap-1">
@@ -167,6 +192,8 @@ export default async function CandidateJobsPage() {
                       </div>
                     </div>
                   )}
+                  {/* Personal Memos (Hidden for others, visible only to themselves) */}
+                  <JobMemoPanel jobId={job.id} initialContent={memo} themeColor="candidate" />
                 </div>
 
                 {/* Apply Button */}

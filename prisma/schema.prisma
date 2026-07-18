@@ -91,6 +91,8 @@ model User {
   interviews       Interview[]       @relation("Interviewer")
   notifications    Notification[]
   auditLogs        AuditLog[]
+  username         String?   @unique
+  jobNotes         JobNote[]
 }
 
 model CandidateProfile {
@@ -115,8 +117,11 @@ model Job {
   department     String
   location       String
   employmentType String
-  salaryRange    String?
-  description    String    @db.Text
+  salaryRange     String?
+  workingHours    String?
+  workingDays     String?
+  experienceLevel String?
+  description     String    @db.Text
   requiredSkills String[]
   status         JobStatus @default(DRAFT)
   expiresAt      DateTime?
@@ -126,6 +131,7 @@ model Job {
 
   recruiter    User          @relation("RecruiterJobs", fields: [recruiterId], references: [id])
   applications Application[]
+  jobNotes     JobNote[]
 
   @@index([recruiterId])
 }
@@ -202,4 +208,20 @@ model AuditLog {
   timestamp DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model JobNote {
+  id        String   @id @default(cuid())
+  jobId     String
+  userId    String
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  job  Job  @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([jobId, userId])
+  @@index([userId])
+  @@index([jobId])
 }

@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/table";
 import { formatDistanceToNow } from "date-fns";
 import { archiveJob } from "@/server/actions/job";
+import { JobMemoPanel } from "@/components/features/jobs/JobMemoPanel";
 
 export const dynamic = "force-dynamic";
 
@@ -29,6 +30,9 @@ export default async function JobsDashboardPage() {
     include: {
       _count: {
         select: { applications: true },
+      },
+      jobNotes: {
+        where: { userId: session.user.id },
       },
     },
   });
@@ -72,43 +76,48 @@ export default async function JobsDashboardPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {jobs.map((job) => (
-                <TableRow key={job.id} className="hover:bg-gray-50/40">
-                  <TableCell className="font-medium text-slate-900">
-                    <div className="flex flex-col">
-                      <Link href={`/dashboard/jobs/${job.id}/pipeline`} className="hover:text-[#C97C5D] font-semibold transition-colors">
-                        {job.title}
-                      </Link>
-                      <span className="text-xs font-normal text-gray-500">{(job.companyName || "Company")} • {job.department} • {job.location}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${job.status === 'OPEN' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
-                      {job.status}
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-gray-600">{job._count.applications}</TableCell>
-                  <TableCell className="text-gray-500">
-                    {formatDistanceToNow(new Date(job.createdAt), { addSuffix: true })}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end items-center gap-3">
-                      <Link href={`/dashboard/jobs/${job.id}/pipeline`} className="text-[#2F5D50] hover:text-[#23473D] hover:underline font-semibold text-sm">
-                        View Pipeline
-                      </Link>
-                      <span className="text-gray-300">|</span>
-                      <form action={async () => {
-                        "use server";
-                        await archiveJob(job.id);
-                      }}>
-                        <button type="submit" className="text-rose-600 hover:text-rose-800 hover:underline font-semibold text-sm">
-                          Remove
-                        </button>
-                      </form>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
+              {jobs.map((job) => {
+                const memo = job.jobNotes?.[0]?.content || "";
+                return (
+                  <TableRow key={job.id} className="hover:bg-gray-50/40">
+                    <TableCell className="font-medium text-slate-900">
+                      <div className="flex flex-col">
+                        <Link href={`/dashboard/jobs/${job.id}/pipeline`} className="hover:text-[#C97C5D] font-semibold transition-colors">
+                          {job.title}
+                        </Link>
+                        <span className="text-xs font-normal text-gray-500">{(job.companyName || "Company")} • {job.department} • {job.location}</span>
+                        {/* Recruiter Memo panel */}
+                        <JobMemoPanel jobId={job.id} initialContent={memo} themeColor="recruiter" />
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${job.status === 'OPEN' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                        {job.status}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-gray-600">{job._count.applications}</TableCell>
+                    <TableCell className="text-gray-500">
+                      {formatDistanceToNow(new Date(job.createdAt), { addSuffix: true })}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end items-center gap-3">
+                        <Link href={`/dashboard/jobs/${job.id}/pipeline`} className="text-[#2F5D50] hover:text-[#23473D] hover:underline font-semibold text-sm">
+                          View Pipeline
+                        </Link>
+                        <span className="text-gray-300">|</span>
+                        <form action={async () => {
+                          "use server";
+                          await archiveJob(job.id);
+                        }}>
+                          <button type="submit" className="text-rose-600 hover:text-rose-800 hover:underline font-semibold text-sm">
+                            Remove
+                          </button>
+                        </form>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </div>

@@ -12,6 +12,9 @@ export const jobSchema = z.object({
   requiredSkills: z.string().min(2, "Please enter at least one skill."),
   status: z.nativeEnum(JobStatus),
   expiresAt: z.string().optional().or(z.literal("")),
+  workingHours: z.string().optional(),
+  workingDays: z.string().optional(),
+  experienceLevel: z.string().optional(),
 });
 
 export type JobInput = z.infer<typeof jobSchema>;

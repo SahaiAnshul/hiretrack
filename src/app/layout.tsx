@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
+import { ThemeProvider } from "@/components/ThemeProvider";
+import { SessionProvider } from "next-auth/react";
+import { NotificationWatcher } from "@/components/NotificationWatcher";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -16,10 +19,29 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        {children}
-        <Toaster position="top-right" richColors />
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                const fontSize = localStorage.getItem('hiretrack-font-size') || 'medium';
+                const density = localStorage.getItem('hiretrack-density') || 'comfortable';
+                document.documentElement.setAttribute('data-font-size', fontSize);
+                document.documentElement.setAttribute('data-density', density);
+              } catch (_) {}
+            `,
+          }}
+        />
+      </head>
+      <body className={`${inter.className} min-h-screen bg-background text-foreground transition-colors duration-250`}>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <SessionProvider>
+            {children}
+            <NotificationWatcher />
+          </SessionProvider>
+          <Toaster position="top-right" richColors />
+        </ThemeProvider>
       </body>
     </html>
   );

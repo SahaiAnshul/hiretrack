@@ -49,6 +49,16 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const passwordsMatch = await bcrypt.compare(password, user.passwordHash);
 
         if (passwordsMatch) {
+          // Log login audit log
+          await db.auditLog.create({
+            data: {
+              userId: user.id,
+              action: "LOGIN",
+              entity: "USER",
+              entityId: user.id,
+            },
+          });
+
           return {
             id: user.id,
             name: user.name,
