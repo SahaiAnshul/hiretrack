@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 // --- ENUMS ---
@@ -110,6 +111,7 @@ model CandidateProfile {
 model Job {
   id             String    @id @default(cuid())
   title          String
+  companyName    String?
   department     String
   location       String
   employmentType String
@@ -117,12 +119,15 @@ model Job {
   description    String    @db.Text
   requiredSkills String[]
   status         JobStatus @default(DRAFT)
+  expiresAt      DateTime?
   recruiterId    String
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
   recruiter    User          @relation("RecruiterJobs", fields: [recruiterId], references: [id])
   applications Application[]
+
+  @@index([recruiterId])
 }
 
 model Application {
@@ -138,6 +143,9 @@ model Application {
   job        Job               @relation(fields: [jobId], references: [id], onDelete: Cascade)
   candidate  CandidateProfile  @relation(fields: [candidateId], references: [id], onDelete: Cascade)
   interviews Interview[]
+
+  @@index([candidateId])
+  @@index([jobId])
 }
 
 model Interview {
@@ -153,6 +161,9 @@ model Interview {
   application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
   interviewer User        @relation("Interviewer", fields: [interviewerId], references: [id])
   scorecard   Scorecard?
+
+  @@index([applicationId])
+  @@index([interviewerId])
 }
 
 model Scorecard {

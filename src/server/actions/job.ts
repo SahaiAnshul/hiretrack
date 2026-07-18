@@ -20,12 +20,13 @@ export async function createJob(data: JobInput) {
       return { error: "Invalid data provided. Please check the form." };
     }
 
-    const { title, department, location, employmentType, salaryRange, description, requiredSkills, status } = validatedData.data;
+    const { title, companyName, department, location, employmentType, salaryRange, description, requiredSkills, status, expiresAt } = validatedData.data;
 
     // 3. Mutate
     const job = await db.job.create({
       data: {
         title,
+        companyName,
         department,
         location,
         employmentType,
@@ -33,6 +34,7 @@ export async function createJob(data: JobInput) {
         description,
         requiredSkills: requiredSkills.split(",").map((s) => s.trim()).filter(Boolean),
         status,
+        expiresAt: expiresAt ? new Date(expiresAt) : null,
         recruiterId: session.user.id,
       },
     });

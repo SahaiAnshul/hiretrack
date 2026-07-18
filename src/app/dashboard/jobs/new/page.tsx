@@ -27,6 +27,7 @@ export default function CreateJobPage() {
     resolver: zodResolver(jobSchema),
     defaultValues: {
       title: "",
+      companyName: "",
       department: "",
       location: "",
       employmentType: "Full-time",
@@ -34,6 +35,7 @@ export default function CreateJobPage() {
       description: "",
       requiredSkills: "",
       status: "OPEN",
+      expiresAt: "",
     },
   });
 
@@ -48,6 +50,36 @@ export default function CreateJobPage() {
         router.push("/dashboard/jobs");
       }
     });
+  };
+
+  const generateDescriptionTemplate = () => {
+    const title = form.getValues("title") || "Software Engineer";
+    const department = form.getValues("department") || "Engineering";
+    const skills = form.getValues("requiredSkills") || "React, TypeScript";
+
+    const template = `### About the Role
+We are looking for a skilled **${title}** to join our **${department}** team. In this role, you will be responsible for building high-quality features, collaborating with cross-functional teams, and ensuring the technical feasibility of designs.
+
+### Key Responsibilities
+- Design, build, and maintain efficient, reusable, and reliable code.
+- Collaborate with product managers, UX designers, and other engineers.
+- Identify bottlenecks, bug reports, and implement solutions/fixes.
+- Participate in code reviews and advocate for engineering best practices.
+
+### Requirements & Skills
+- Proven experience as a ${title} or similar engineering role.
+- Strong proficiency in: **${skills}**.
+- Excellent problem-solving abilities and communication skills.
+- Ability to work effectively in a fast-paced environment.
+
+### What We Offer
+- Competitive salary and benefits package.
+- Flexible work hours and remote-friendly policies.
+- Opportunities for career growth and professional development.
+- Inclusive, supportive company culture.`;
+
+    form.setValue("description", template);
+    toast.success("Job description template generated!");
   };
 
   return (
@@ -66,6 +98,12 @@ export default function CreateJobPage() {
           </div>
 
           <div className="space-y-2">
+            <Label htmlFor="companyName">Company Name</Label>
+            <Input id="companyName" disabled={isPending} placeholder="e.g. Google" {...form.register("companyName")} />
+            {form.formState.errors.companyName && <p className="text-sm text-red-500">{form.formState.errors.companyName.message}</p>}
+          </div>
+
+          <div className="space-y-2">
             <Label htmlFor="department">Department</Label>
             <Input id="department" disabled={isPending} placeholder="e.g. Engineering" {...form.register("department")} />
             {form.formState.errors.department && <p className="text-sm text-red-500">{form.formState.errors.department.message}</p>}
@@ -78,10 +116,16 @@ export default function CreateJobPage() {
           </div>
 
           <div className="space-y-2">
+            <Label htmlFor="expiresAt">Visibility Expiry Date</Label>
+            <Input id="expiresAt" type="date" disabled={isPending} {...form.register("expiresAt")} />
+            {form.formState.errors.expiresAt && <p className="text-sm text-red-500">{form.formState.errors.expiresAt.message}</p>}
+          </div>
+
+          <div className="space-y-2">
             <Label>Employment Type</Label>
             <Select 
               disabled={isPending} 
-              onValueChange={(val) => form.setValue("employmentType", val)} 
+              onValueChange={(val) => form.setValue("employmentType", val || "")} 
               defaultValue={form.getValues("employmentType")}
             >
               <SelectTrigger>
@@ -103,8 +147,17 @@ export default function CreateJobPage() {
           </div>
 
           <div className="space-y-2 md:col-span-2">
-            <Label htmlFor="description">Job Description</Label>
-            <Textarea id="description" disabled={isPending} className="min-h-[150px]" placeholder="Detailed description of the role..." {...form.register("description")} />
+            <div className="flex justify-between items-center">
+              <Label htmlFor="description">Job Description</Label>
+              <button
+                type="button"
+                onClick={generateDescriptionTemplate}
+                className="text-xs text-[#2F5D50] hover:text-[#23473D] font-semibold hover:underline flex items-center gap-1"
+              >
+                ✨ Generate Template
+              </button>
+            </div>
+            <Textarea id="description" disabled={isPending} className="min-h-[180px] leading-relaxed" placeholder="Detailed description of the role..." {...form.register("description")} />
             {form.formState.errors.description && <p className="text-sm text-red-500">{form.formState.errors.description.message}</p>}
           </div>
         </div>

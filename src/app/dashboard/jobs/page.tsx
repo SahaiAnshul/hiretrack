@@ -12,6 +12,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { formatDistanceToNow } from "date-fns";
+import { archiveJob } from "@/server/actions/job";
+
+export const dynamic = "force-dynamic";
 
 export default async function JobsDashboardPage() {
   const session = await auth();
@@ -48,7 +51,7 @@ export default async function JobsDashboardPage() {
         <div className="flex min-h-[400px] flex-col items-center justify-center rounded-xl border border-dashed border-gray-300 bg-gray-50 p-8 text-center">
           <h3 className="mb-2 text-lg font-medium text-gray-900">No jobs posted</h3>
           <p className="mb-6 max-w-sm text-sm text-gray-500">
-            You haven't posted any jobs yet. Create your first job posting to start receiving applications.
+            You haven&apos;t posted any jobs yet. Create your first job posting to start receiving applications.
           </p>
           <Link href="/dashboard/jobs/new">
             <Button className="bg-[#2F5D50] hover:bg-[#23473D] text-white">
@@ -64,16 +67,19 @@ export default async function JobsDashboardPage() {
                 <TableHead>Role</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Applicants</TableHead>
-                <TableHead className="text-right">Created</TableHead>
+                <TableHead>Created</TableHead>
+                <TableHead className="text-right">Action</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {jobs.map((job) => (
-                <TableRow key={job.id}>
+                <TableRow key={job.id} className="hover:bg-gray-50/40">
                   <TableCell className="font-medium text-slate-900">
                     <div className="flex flex-col">
-                      <span>{job.title}</span>
-                      <span className="text-xs font-normal text-gray-500">{job.department} • {job.location}</span>
+                      <Link href={`/dashboard/jobs/${job.id}/pipeline`} className="hover:text-[#C97C5D] font-semibold transition-colors">
+                        {job.title}
+                      </Link>
+                      <span className="text-xs font-normal text-gray-500">{(job.companyName || "Company")} • {job.department} • {job.location}</span>
                     </div>
                   </TableCell>
                   <TableCell>
@@ -82,8 +88,24 @@ export default async function JobsDashboardPage() {
                     </span>
                   </TableCell>
                   <TableCell className="text-gray-600">{job._count.applications}</TableCell>
-                  <TableCell className="text-right text-gray-500">
+                  <TableCell className="text-gray-500">
                     {formatDistanceToNow(new Date(job.createdAt), { addSuffix: true })}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end items-center gap-3">
+                      <Link href={`/dashboard/jobs/${job.id}/pipeline`} className="text-[#2F5D50] hover:text-[#23473D] hover:underline font-semibold text-sm">
+                        View Pipeline
+                      </Link>
+                      <span className="text-gray-300">|</span>
+                      <form action={async () => {
+                        "use server";
+                        await archiveJob(job.id);
+                      }}>
+                        <button type="submit" className="text-rose-600 hover:text-rose-800 hover:underline font-semibold text-sm">
+                          Remove
+                        </button>
+                      </form>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
