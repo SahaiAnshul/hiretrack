@@ -81,6 +81,11 @@ We are looking for a skilled **${title}** to join our **${department}** team. In
 - Opportunities for career growth and professional development.
 - Inclusive, supportive company culture.`;
 
+    if (!form.getValues("salaryRange")) form.setValue("salaryRange", "$90,000 - $130,000");
+    if (!form.getValues("workingHours")) form.setValue("workingHours", "9 AM - 5 PM");
+    if (!form.getValues("workingDays")) form.setValue("workingDays", "Mon - Fri (Sat-Sun off)");
+    if (!form.getValues("experienceLevel")) form.setValue("experienceLevel", "Mid-Level (2-4 years)");
+
     form.setValue("description", template);
     toast.success("Job description template generated!");
   };
@@ -119,32 +124,32 @@ We are looking for a skilled **${title}** to join our **${department}** team. In
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="expiresAt">Visibility Expiry Date <span className="text-red-500">*</span></Label>
-            <Input id="expiresAt" required type="date" disabled={isPending} {...form.register("expiresAt")} />
+            <Label htmlFor="expiresAt">Visibility Expiry Date <span className="text-xs text-gray-400 font-normal">(Optional)</span></Label>
+            <Input id="expiresAt" type="date" disabled={isPending} {...form.register("expiresAt")} />
             {form.formState.errors.expiresAt && <p className="text-sm text-red-500">{form.formState.errors.expiresAt.message}</p>}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="salaryRange">Salary Range <span className="text-red-500">*</span></Label>
-            <Input id="salaryRange" required disabled={isPending} placeholder="e.g. $80,000 - $100,000" {...form.register("salaryRange")} />
+            <Label htmlFor="salaryRange">Salary Range <span className="text-xs text-gray-400 font-normal">(Optional)</span></Label>
+            <Input id="salaryRange" disabled={isPending} placeholder="e.g. $80,000 - $100,000" {...form.register("salaryRange")} />
             {form.formState.errors.salaryRange && <p className="text-sm text-red-500">{form.formState.errors.salaryRange.message}</p>}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="workingHours">Working Hours <span className="text-red-500">*</span></Label>
-            <Input id="workingHours" required disabled={isPending} placeholder="e.g. 9 AM - 6 PM" {...form.register("workingHours")} />
+            <Label htmlFor="workingHours">Working Hours <span className="text-xs text-gray-400 font-normal">(Optional)</span></Label>
+            <Input id="workingHours" disabled={isPending} placeholder="e.g. 9 AM - 6 PM" {...form.register("workingHours")} />
             {form.formState.errors.workingHours && <p className="text-sm text-red-500">{form.formState.errors.workingHours.message}</p>}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="workingDays">Working Days & Offs <span className="text-red-500">*</span></Label>
-            <Input id="workingDays" required disabled={isPending} placeholder="e.g. Mon-Fri (Sat-Sun off)" {...form.register("workingDays")} />
+            <Label htmlFor="workingDays">Working Days & Offs <span className="text-xs text-gray-400 font-normal">(Optional)</span></Label>
+            <Input id="workingDays" disabled={isPending} placeholder="e.g. Mon-Fri (Sat-Sun off)" {...form.register("workingDays")} />
             {form.formState.errors.workingDays && <p className="text-sm text-red-500">{form.formState.errors.workingDays.message}</p>}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="experienceLevel">Experience Level Required <span className="text-red-500">*</span></Label>
-            <Input id="experienceLevel" required disabled={isPending} placeholder="e.g. Mid-Level (2-4 years)" {...form.register("experienceLevel")} />
+            <Label htmlFor="experienceLevel">Experience Level <span className="text-xs text-gray-400 font-normal">(Optional)</span></Label>
+            <Input id="experienceLevel" disabled={isPending} placeholder="e.g. Mid-Level (2-4 years)" {...form.register("experienceLevel")} />
             {form.formState.errors.experienceLevel && <p className="text-sm text-red-500">{form.formState.errors.experienceLevel.message}</p>}
           </div>
 

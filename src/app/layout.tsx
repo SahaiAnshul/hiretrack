@@ -1,12 +1,9 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { SessionProvider } from "next-auth/react";
 import { NotificationWatcher } from "@/components/NotificationWatcher";
-
-const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "HireTrack | Modern ATS",
@@ -34,7 +31,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${inter.className} min-h-screen bg-background text-foreground transition-colors duration-250`}>
+      <body className="font-sans min-h-screen bg-background text-foreground transition-colors duration-250">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <SessionProvider>
             {children}
