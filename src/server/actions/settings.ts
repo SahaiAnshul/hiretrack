@@ -64,7 +64,7 @@ export async function updateUsernameAndDetails(data: { username: string; name: s
         return { error: "Username must be 3-20 characters long and contain only letters, numbers, hyphens, or underscores." };
       }
 
-      const existing = await db.user.findUnique({
+      const existing = await db.user.findFirst({
         where: { username: cleanUsername },
         select: { id: true },
       });
