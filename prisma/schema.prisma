@@ -3,9 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
 }
 
 // --- ENUMS ---
@@ -38,17 +37,17 @@ enum InterviewStatus {
 
 // --- AUTH.JS REQUIRED TABLES ---
 model Account {
-  id                String  @id @default(cuid())
-  userId            String
+  id                String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String  @db.ObjectId
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String?
   session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -57,14 +56,15 @@ model Account {
 }
 
 model Session {
-  id           String   @id @default(cuid())
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
   sessionToken String   @unique
-  userId       String
+  userId       String   @db.ObjectId
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model VerificationToken {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
   identifier String
   token      String   @unique
   expires    DateTime
@@ -74,7 +74,7 @@ model VerificationToken {
 
 // --- DOMAIN MODELS ---
 model User {
-  id            String    @id @default(cuid())
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
   name          String?
   email         String?   @unique
   emailVerified DateTime?
@@ -96,38 +96,38 @@ model User {
 }
 
 model CandidateProfile {
-  id         String   @id @default(cuid())
-  userId     String   @unique
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId     String   @unique @db.ObjectId
   phone      String?
-  experience String?  @db.Text
-  education  String?  @db.Text
+  experience String?
+  education  String?
   skills     String[]
   linkedin   String?
   portfolio  String?
-  summary    String?  @db.Text
+  summary    String?
 
   user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   applications Application[]
 }
 
 model Job {
-  id             String    @id @default(cuid())
-  title          String
-  companyName    String?
-  department     String
-  location       String
-  employmentType String
+  id              String    @id @default(auto()) @map("_id") @db.ObjectId
+  title           String
+  companyName     String?
+  department      String
+  location        String
+  employmentType  String
   salaryRange     String?
   workingHours    String?
   workingDays     String?
   experienceLevel String?
-  description     String    @db.Text
-  requiredSkills String[]
-  status         JobStatus @default(DRAFT)
-  expiresAt      DateTime?
-  recruiterId    String
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  description     String
+  requiredSkills  String[]
+  status          JobStatus @default(DRAFT)
+  expiresAt       DateTime?
+  recruiterId     String    @db.ObjectId
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
   recruiter    User          @relation("RecruiterJobs", fields: [recruiterId], references: [id])
   applications Application[]
@@ -137,11 +137,11 @@ model Job {
 }
 
 model Application {
-  id           String           @id @default(cuid())
-  jobId        String
-  candidateId  String
+  id           String           @id @default(auto()) @map("_id") @db.ObjectId
+  jobId        String           @db.ObjectId
+  candidateId  String           @db.ObjectId
   resumeUrl    String?
-  coverLetter  String?          @db.Text
+  coverLetter  String?
   currentStage ApplicationStage @default(APPLIED)
   appliedAt    DateTime         @default(now())
   updatedAt    DateTime         @updatedAt
@@ -155,14 +155,14 @@ model Application {
 }
 
 model Interview {
-  id            String          @id @default(cuid())
-  applicationId String
-  interviewerId String
+  id            String          @id @default(auto()) @map("_id") @db.ObjectId
+  applicationId String          @db.ObjectId
+  interviewerId String          @db.ObjectId
   scheduledAt   DateTime
   meetingLink   String?
   interviewType String
   status        InterviewStatus @default(SCHEDULED)
-  notes         String?         @db.Text
+  notes         String?
 
   application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
   interviewer User        @relation("Interviewer", fields: [interviewerId], references: [id])
@@ -173,8 +173,8 @@ model Interview {
 }
 
 model Scorecard {
-  id             String   @id @default(cuid())
-  interviewId    String   @unique
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  interviewId    String   @unique @db.ObjectId
   technical      Int      @default(0)
   communication  Int      @default(0)
   problemSolving Int      @default(0)
@@ -182,15 +182,15 @@ model Scorecard {
   cultureFit     Int      @default(0)
   overallScore   Float    @default(0)
   recommendation String   // e.g., "Strong Hire", "No Hire"
-  feedback       String   @db.Text
+  feedback       String
   createdAt      DateTime @default(now())
 
   interview Interview @relation(fields: [interviewId], references: [id], onDelete: Cascade)
 }
 
 model Notification {
-  id        String   @id @default(cuid())
-  userId    String
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
   title     String
   message   String
   read      Boolean  @default(false)
@@ -200,8 +200,8 @@ model Notification {
 }
 
 model AuditLog {
-  id        String   @id @default(cuid())
-  userId    String
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
   action    String
   entity    String
   entityId  String
@@ -211,10 +211,10 @@ model AuditLog {
 }
 
 model JobNote {
-  id        String   @id @default(cuid())
-  jobId     String
-  userId    String
-  content   String   @db.Text
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  jobId     String   @db.ObjectId
+  userId    String   @db.ObjectId
+  content   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
